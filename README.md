@@ -1,5 +1,8 @@
 # CNN手写数字识别 - 基于MNIST数据集
 
+[![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/)
+[![Jupyter](https://img.shields.io/badge/Jupyter-Notebook-orange.svg)](https://jupyter.org/)
+
 这个项目使用卷积神经网络（CNN）对 MNIST 手写数字数据集进行分类识别。模型在测试集上达到了约 **99.4%** 的准确率，并支持 GPU 加速和混合精度训练。
 
 所有代码均整合在一个 Jupyter Notebook 文件中，便于查看和复现。
