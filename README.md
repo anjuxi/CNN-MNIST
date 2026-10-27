@@ -1,33 +1,32 @@
-# CNN手写数字识别 - 基于MNIST数据集
+# CNN Handwritten Digit Recognition on MNIST
 
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/)
 [![Jupyter](https://img.shields.io/badge/Jupyter-Notebook-orange.svg)](https://jupyter.org/)
 
-这个项目使用卷积神经网络（CNN）对 MNIST 手写数字数据集进行分类识别。模型在测试集上达到了约 **99.4%** 的准确率，并支持 GPU 加速和混合精度训练。
+A CNN for classifying MNIST handwritten digits. The model reaches about **99.4%** test accuracy and supports GPU acceleration and mixed-precision training.
 
-所有代码均整合在一个 Jupyter Notebook 文件中，便于查看和复现。
+All code is in a single Jupyter Notebook so it's easy to review and reproduce.
 
-## 目录
+## Contents
 
-- [项目简介](#项目简介)
-- [数据集](#数据集)
-- [模型架构](#模型架构)
-- [训练细节](#训练细节)
-- [结果与评估](#结果与评估)
-- [如何使用](#如何使用)
-- [文件说明](#文件说明)
+- [Overview](#overview)
+- [Dataset](#dataset)
+- [Model Architecture](#model-architecture)
+- [Training](#training)
+- [Results](#results)
+- [Usage](#usage)
+- [Files](#files)
 
-## 项目简介
+## Overview
 
-MNIST（Modified National Institute of Standards and Technology）是一个经典的手写数字数据集，包含 60,000 张训练图片和 10,000 张测试图片，每张图片为 28×28 的灰度图像。
+MNIST is a classic handwritten digit dataset: 60,000 training images and 10,000 test images, each 28×28 grayscale. This project builds a CNN in PyTorch for high-accuracy digit recognition.
 
-本项目利用 PyTorch 构建了一个卷积神经网络（CNN），实现了高精度的数字识别。
+## Dataset
 
-## 数据集
+Downloaded automatically via `torchvision.datasets.MNIST` and preprocessed:
 
-数据通过 `torchvision.datasets.MNIST` 自动下载，并进行了预处理：
-- 转换为张量（`ToTensor()`）
-- 标准化：均值 0.1307，标准差 0.3081
+- Converted to tensors (`ToTensor()`)
+- Normalized: mean 0.1307, std 0.3081
 
 ```python
 transform = transforms.Compose([
@@ -36,45 +35,43 @@ transform = transforms.Compose([
 ])
 ```
 
-## 模型架构
+## Model Architecture
 
-CNN 模型结构如下：
-
-| 层类型               | 参数                                             |
+| Layer | Parameters |
 |---------------------|--------------------------------------------------|
-| Conv2d              | 输入通道 1 → 输出通道 32，卷积核 3×3，padding 1 |
-| BatchNorm2d + ReLU  | 32                                              |
-| MaxPool2d           | 核大小 2×2，步长 2                              |
-| Conv2d              | 32 → 64，卷积核 3×3，padding 1                 |
-| BatchNorm2d + ReLU  | 64                                              |
-| MaxPool2d           | 2×2                                             |
-| Conv2d              | 64 → 128，卷积核 3×3，padding 1                |
-| BatchNorm2d + ReLU  | 128                                             |
-| MaxPool2d           | 2×2                                             |
-| Dropout             | 0.3                                             |
-| Linear              | 128×3×3 = 1152 → 256                            |
-| ReLU + Dropout(0.3) | -                                               |
-| Linear              | 256 → 10 (输出 10 个类别)                       |
+| Conv2d | 1 → 32 channels, 3×3 kernel, padding 1 |
+| BatchNorm2d + ReLU | 32 |
+| MaxPool2d | 2×2 kernel, stride 2 |
+| Conv2d | 32 → 64, 3×3 kernel, padding 1 |
+| BatchNorm2d + ReLU | 64 |
+| MaxPool2d | 2×2 |
+| Conv2d | 64 → 128, 3×3 kernel, padding 1 |
+| BatchNorm2d + ReLU | 128 |
+| MaxPool2d | 2×2 |
+| Dropout | 0.3 |
+| Linear | 128×3×3 = 1152 → 256 |
+| ReLU + Dropout(0.3) | - |
+| Linear | 256 → 10 (10 classes) |
 
-## 训练细节
+## Training
 
-- **批量大小**：2048
-- **优化器**：Adam，学习率 0.001
-- **学习率调度**：每 10 个 epoch 乘以 0.1 (`StepLR`)
-- **损失函数**：交叉熵损失
-- **训练轮数**：50
-- **混合精度**：使用 `torch.cuda.amp` 加速训练（如果 GPU 可用）
-- **多 GPU**：自动检测并使用所有可用 GPU（通过 `nn.DataParallel`）
+- **Batch size**: 2048
+- **Optimizer**: Adam, learning rate 0.001
+- **LR schedule**: StepLR, ×0.1 every 10 epochs
+- **Loss**: cross-entropy
+- **Epochs**: 50
+- **Mixed precision**: `torch.cuda.amp` when a GPU is available
+- **Multi-GPU**: uses all available GPUs via `nn.DataParallel`
 
-## 结果与评估
+## Results
 
-### 训练过程
+### Training
 
-- 训练用时约 **5 分钟**（在 Tesla T4 GPU 上，批量大小 2048）
-- 最佳测试准确率：**99.41%**（第 12 个 epoch）
-- 最终测试准确率：**99.38%**（第 50 个 epoch）
+- About **5 minutes** on a Tesla T4 (batch size 2048)
+- Best test accuracy: **99.41%** (epoch 12)
+- Final test accuracy: **99.38%** (epoch 50)
 
-### 分类报告（测试集）
+### Classification report (test set)
 
 ```
               precision    recall  f1-score   support
@@ -92,35 +89,37 @@ CNN 模型结构如下：
     accuracy                           0.99     10000
 ```
 
-### 混淆矩阵
+### Confusion Matrix
 
-训练完成后 Notebook 会自动生成混淆矩阵热力图，直观展示每个数字的分类情况。
+The notebook generates a confusion matrix heatmap after training.
 
-## 如何使用
+## Usage
 
-### 1. 运行训练
+### 1. Run Training
 
-直接执行 Jupyter Notebook 中的所有单元格即可开始训练。训练过程中会输出每个 epoch 的损失、准确率和耗时，并自动保存最佳模型为 `mnist_cnn_best.pth`。
+Run all cells in the notebook. Each epoch prints loss, accuracy, and time. The best model is saved as `mnist_cnn_best.pth`.
 
-### 2. 测试单张图片
+### 2. Predict a Single Image
 
-Notebook 提供了 `predict_single_image` 函数，可对任意单张 MNIST 图片进行预测并输出置信度最高的前 10 个类别。
+The notebook provides `predict_single_image`, which predicts on a single MNIST image and returns the top 10 classes with confidence scores.
 
-示例：
+Example:
+
 ```python
 pred_label, confidence, probs = predict_single_image(model, image, device)
 ```
 
-## 文件说明
+## Files
 
-- `CNN_mnist.ipynb`：完整的项目代码，包含数据处理、模型定义、训练、评估和可视化。
+- `CNN_mnist.ipynb` — full project code: data loading, model definition, training, evaluation, and visualization.
 
-## 联系方式
-我的邮箱：`anjuxi.ME@outlook.com`
+## Contact
 
-我的 SIP 电话：`sip:anjuxi@sip.linphone.org`
+Email: `anjuxi.ME@outlook.com`
+
+SIP: `sip:anjuxi@sip.linphone.org`
 
 ---
-**作者**：Ailan Anjuxi  
-**许可**：MIT
+**Author**: Ailan Anjuxi
+**License**: MIT
 ---
